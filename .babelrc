@@ -1,0 +1,26 @@
+// {
+//   "presets": [
+//     ["env", { "esmodules": true }],
+//     "stage-3"
+//   ]
+// }
+// {
+//   "presets": [
+//     [
+//       "@babel/preset-env",
+//       {
+//         "targets": {
+//           "esmodules": true
+//         }
+//       }
+//     ]
+//   ]
+// }
+
+{
+  "plugins": [
+    ["transform-runtime", {
+      "regenerator": true
+    }]
+  ]
+}

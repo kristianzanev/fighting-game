@@ -1,60 +1,86 @@
+
 <template>
-  <div id="app">
-    <img src="./assets/logo.png">
-    <h1>{{ msg }}</h1>
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+  <div class="game">
+    <div id='stage'>
+      <HealthBar v-bind:healthStatus="this.healthBar.player1"/>
+      <HealthBar position='right' v-bind:healthStatus="this.healthBar.player2"/>
+      <Modal v-if="!isFormDone" v-on:formValidated = "formValidated" />
+    </div>
   </div>
 </template>
 
 <script>
+import FightScene from '../fightscene/FightScene'
+import HealthBar from './components/HealthBar'
+import Modal from './components/Modal'
+
 export default {
   name: 'app',
+  components: {
+    HealthBar,
+    Modal
+  },
   data () {
     return {
-      msg: 'Welcome to Your Vue.js App'
+      healthBar: {
+        player1: {
+          health: 100,
+          name: 'player1'
+        },
+        player2: {
+          health: 100,
+          name: 'player2'
+        }
+      },
+      isFormDone: false
+    }
+  },
+  mounted () {
+    const stage = document.querySelector('#stage')
+    const scene = new FightScene()
+    scene.createScene(stage)
+    scene.addListener('hit', (hitPlayer) => this.$emit('healthChange', hitPlayer))
+    // Modal.$on('formValidated', e => console.warn(e))
+    this.$on('healthChange', e => this.updateHealth(e))
+    this.$on('formDone', e => {
+      this.isFormDone = true
+      scene.onUserInput(e)
+    })
+  },
+  methods: {
+    updateHealth (hitPlayer) {
+      this.healthBar[hitPlayer.name].health = hitPlayer.health
+    },
+    formValidated (data) {
+      this.$emit('formDone', data)
     }
   }
 }
 </script>
 
 <style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+$health-barPadding: 5px;
+
+#stage {
+  // position: absolute;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+.bar-wrap {
+  width: 30%;
+  height: 5%;
+  background: #cbcbcb;
+  position: absolute;
+  padding: $health-barPadding;
+  .health-bar {
+    width: calc(100% - (2 * #{$health-barPadding}));
+    height: calc(100% - (2 *#{$health-barPadding}));
+    background: gray;
+    position: absolute;
+  }
+  .left-health-bar {
+    background: red;
+  }
 }
 
-h1, h2 {
-  font-weight: normal;
-}
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
-}
 </style>
