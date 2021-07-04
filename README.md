@@ -1,6 +1,6 @@
-# fighting-game
+# fighting-game [LINK](https://fightergame-vue.herokuapp.com/) 
 
-> Simple fighting game
+> Simple fighting game 
 
 ## Build Setup
 
